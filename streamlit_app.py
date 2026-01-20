@@ -17,7 +17,7 @@ if access_code == "moje-sliepky-2026" and user_nickname:
     st.success(f"Prihlásený: {user_nickname}")
     
     with st.form("entry_form", clear_on_submit=True):
-        kurin = st.selectbox("Vyberte kurín", ["Horný dvor", "Zadný dvor", "Pri stodole"])
+        kurin = st.selectbox("Vyberte kurín", ["Stare sliepky", "Nove sliepky", "Volny vybeh"])
         pocet = st.number_input("Počet vajec", min_value=0, step=1)
         poznamka = st.text_area("Poznámka")
         submitted = st.form_submit_button("Uložiť")
