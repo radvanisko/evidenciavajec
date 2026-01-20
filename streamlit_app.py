@@ -1,18 +1,20 @@
 import streamlit as st
 import pandas as pd
 from datetime import date
+from streamlit_gsheets import GSheetsConnection
 
 # Nastavenie vzhľadu
 st.set_page_config(page_title="Evi-Vajce", page_icon="🥚")
 st.title("🥚 Evidencia znášky")
 
-# Jednoduchý systém "hesla" pre prístup (nahrádza zložité schvaľovanie)
+# Pripojenie k Google Sheets
+conn = st.connection("gsheets", type=GSheetsConnection)
+
 access_code = st.sidebar.text_input("Zadajte prístupový kód", type="password")
 
-if access_code == "moje-sliepky-2026":  # Tu si nastavíte svoje heslo
+if access_code == "moje-sliepky-2026":
     st.success("Prístup schválený")
     
-    # Formulár pre zápis
     with st.form("entry_form"):
         kurin = st.selectbox("Vyberte kurín", ["Horný dvor", "Zadný dvor", "Pri stodole"])
         pocet = st.number_input("Počet vajec", min_value=0, step=1)
@@ -22,8 +24,23 @@ if access_code == "moje-sliepky-2026":  # Tu si nastavíte svoje heslo
         submitted = st.form_submit_button("Uložiť znášku")
         
         if submitted:
-            # Tu sa dáta odošlú do vašej Google tabuľky (cez st.connection)
-            st.info(f"Zápis: {kurin}, {pocet} ks, zapísal {zapisal} dňa {date.today()}")
+            # Vytvorenie nového riadku dát
+            new_data = pd.DataFrame([{
+                "Datum": str(date.today()),
+                "Kurin": kurin,
+                "Pocet": int(pocet),
+                "Meno": zapisal,
+                "Poznamka": poznamka
+            }])
+            
+            # Načítanie starých dát a pridanie nových
+            existing_data = conn.read(worksheet="Zaznamy")
+            updated_df = pd.concat([existing_data, new_data], ignore_index=True)
+            
+            # SKUTOČNÝ ZÁPIS DO GOOGLE SHEETS
+            conn.update(worksheet="Zaznamy", data=updated_df)
+            
+            st.success(f"Dáta boli úspešne uložené do Google tabuľky!")
             st.balloons()
 else:
-    st.warning("Prosím, zadajte kód, ktorý vám poskytol majiteľ farmy.")
+    st.warning("Zadajte prístupový kód.")
