@@ -4,7 +4,7 @@ from datetime import date
 from streamlit_gsheets import GSheetsConnection
 
 # Nastavenie vzhľadu
-st.set_page_config(page_title="Evi-Vajce", page_icon="🥚")
+st.set_page_config(page_title="Radman-Vajce", page_icon="🥚")
 st.title("🥚 Evidencia znášky")
 
 # Pripojenie k Google Sheets (vyžaduje URL v Secrets)
